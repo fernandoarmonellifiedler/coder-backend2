@@ -1,9 +1,7 @@
 import { Router } from "express";
-import userRouter from "./user.router";
+import { userDao } from "../dao/user.dao.js";
 
 const router = Router();
-
-router.use("/user", userRouter());
 
 router.post("/register", async (req, res) => {
     try {
