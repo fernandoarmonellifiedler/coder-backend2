@@ -5,6 +5,9 @@ import router from "./router/index.router.js";
 const app = express();
 connectDB();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use("/api", router);
 
 app.listen(8080, () => {
