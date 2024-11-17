@@ -1,11 +1,13 @@
 import passport from "passport";
 import local from "passport-local";
 import google from "passport-google-oauth20";
+import jwt from "passport-jwt";
 import { userDao } from "../dao/mongo/user.dao.js";
 import { createHash } from "../utils/hashPassword.js";
 
 const LocalStrategy = local.Strategy;
 const GoogleStrategy = google.Strategy;
+const JWTStartegy = jwt.Strategy;
 
 // Función que inicializa todas las estrategias
 export const initializePassport = () => {
