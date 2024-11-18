@@ -4,7 +4,7 @@ import { productDao } from "../dao/mongo/product.dao.js";
 
 
 const router = Router();
-
+// ap/products -> GET
 router.get("/", async (req, res) => {
   try {
     const { limit, page, sort, category, status } = req.query;
