@@ -43,7 +43,7 @@ router.get("/login", (req, res) => {
 })
 
 router.get("/admin", isAdmin, (req, res) => {
- res.send(`Bienvenido usuario ${req.session.user}`) 
+  res.send(`Bienvenido usuario ${req.session.user}`) 
 })
 
 
