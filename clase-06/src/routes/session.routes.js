@@ -4,12 +4,14 @@ import { checkEmail } from "../middlewares/checkEmail.middleware.js";
 import { createHash, isValidPassword } from "../utils/hashPassword.js";
 import passport from "passport";
 import { createToken, verifyToken } from "../utils/jwt.js";
+import { passportCall } from "../middlewares/passport.middleware.js";
+import { authorization } from "../middlewares/authorization.middleware.js";
 
 const router = Router();
 
 router.post(
   "/register",
-  passport.authenticate("register"),
+  passportCall("register"),
   async (req, res) => {
     try {
       res.status(201).json({ status: "success", msg: "Usuario Registrado" });
@@ -72,7 +74,7 @@ router.get("/logout", async (req, res) => {
   }
 });
 
-router.get("/current", passport.authenticate("jwt", { session: false }), async (req, res) => {
+router.get("/current", passportCall("jwt"), authorization("user"), async (req, res) => {
   try {
     const user = await userDao.getById(req.user.id);
 
