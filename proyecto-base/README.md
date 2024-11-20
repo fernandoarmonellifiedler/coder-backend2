@@ -8,7 +8,6 @@ Este proyecto es un e-commerce de venta de productos de tecnología. Se desarrol
 
 - Node.js
 - Express
-- Handlebars
 - MongoDB
 - Mongoose
 
