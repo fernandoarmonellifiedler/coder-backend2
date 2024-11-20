@@ -6,7 +6,7 @@ import { Server } from "socket.io";
 import viewsRoutes from "./routes/views.routes.js";
 import { connectMongoDB } from "./config/mongoDB.config.js";
 import session from "express-session";
-import { initializePassport } from "./config/passpot.config.js";
+import { initializePassport } from "./config/passport.config.js";
 import cookieParser from "cookie-parser";
 
 const app = express();
