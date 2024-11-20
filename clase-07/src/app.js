@@ -3,7 +3,6 @@ import routes from "./routes/index.js";
 import __dirname from "./dirname.js";
 import handlebars from "express-handlebars";
 import { Server } from "socket.io";
-import viewsRoutes from "./routes/views.routes.js";
 import { connectMongoDB } from "./config/mongoDB.config.js";
 import session from "express-session";
 import { initializePassport } from "./config/passport.config.js";
@@ -30,9 +29,6 @@ app.use(
 app.use(cookieParser("secretKey"));
 // Rutas de la api
 app.use("/api", routes);
-
-// Ruta de las vistas
-app.use("/", viewsRoutes)
 
 const httpServer = app.listen(8080, () => {
   console.log("Servidor escuchando en el puerto 8080");
