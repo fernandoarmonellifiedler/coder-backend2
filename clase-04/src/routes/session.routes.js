@@ -74,7 +74,7 @@ router.get("/logout", async (req, res) => {
 
 router.get("/current", async (req, res) => {
   try {
-   
+
     const token = req.cookies.token;
 
     const validToken = verifyToken(token);
