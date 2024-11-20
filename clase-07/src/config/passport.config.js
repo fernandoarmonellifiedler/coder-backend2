@@ -3,6 +3,7 @@ import local from "passport-local";
 import google from "passport-google-oauth20";
 import jwt from "passport-jwt";
 import { userDao } from "../dao/mongo/user.dao.js";
+import { cartDao } from "../dao/mongo/cart.dao.js";
 import { createHash, isValidPassword } from "../utils/hashPassword.js";
 import { cookieExtractor } from "../utils/cookieExtractor.js";
 
@@ -33,6 +34,9 @@ export const initializePassport = () => {
         // Si el usuario existe, retornamos un mensaje de error
         if (user) return done(null, false, { message: "El usuario ya existe" }); // done es equivalente a un next() en los middlewares
 
+        // Creamos un carrito para el nuevo usuario
+        const cart = await cartDao.create();
+
         // Si el usuario no existe creamos un nuevo usuario
         const newUser = {
           first_name,
@@ -40,7 +44,8 @@ export const initializePassport = () => {
           age,
           email: username,
           password: createHash(password),
-          role: role ? role : "user"
+          role: role ? role : "user",
+          cart: cart._id
         };
 
         const userRegister = await userDao.create(newUser);
