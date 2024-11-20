@@ -3,7 +3,7 @@ import local from "passport-local";
 import google from "passport-google-oauth20";
 import jwt from "passport-jwt";
 import { userDao } from "../dao/mongo/user.dao.js";
-import { createHash } from "../utils/hashPassword.js";
+import { createHash, isValidPassword } from "../utils/hashPassword.js";
 import { cookieExtractor } from "../utils/cookieExtractor.js";
 
 const LocalStrategy = local.Strategy;
@@ -52,6 +52,20 @@ export const initializePassport = () => {
     })
   );
 
+  passport.use("login", new LocalStrategy({ usernameField: "email" }, async (username, password, done) => {
+    try {
+      const user = await userDao.getByEmail(username);
+
+      if (!user || !isValidPassword(password, user.password)) {
+        return done(null, false, { message: "Email o contraseña no válido" });
+      }
+
+      done(null, user);
+    } catch (error) {
+      done(error)
+    }
+  }))
+
   // Serialización y deserialización de usuarios
   /* 
   La serialización y deserialización de usuarios es un proceso que nos permite almacenar y recuperar información del usuario en la sesión.
@@ -74,7 +88,6 @@ export const initializePassport = () => {
   });
 
   // Estrategia de google
-
   passport.use(
     "google",
     new GoogleStrategy(

@@ -24,36 +24,15 @@ router.post(
   }
 );
 
-router.post("/login", async (req, res) => {
+router.post("/login", passportCall("login"), async (req, res) => {
+  // Generamos el token
+  const token = createToken(req.user);
+
+  // Guardamos el token en una cookie
+  res.cookie("token", token, { httpOnly: true });
+
   try {
-    const { email, password } = req.body;
-
-    if (email === "adminCoder@coder.com" && password === "adminCod3r123") {
-      req.session.user = {
-        email,
-        first_name: "Admin",
-        role: "admin",
-      };
-      return res
-        .status(200)
-        .json({ status: "success", payload: req.session.user });
-    }
-
-    const user = await userDao.getByEmail(email);
-    // Valida si existe el usuario o si el password no es el mismo que el que tenemos registrado en la base de datos
-    if (!user || !isValidPassword(password, user.password)) {
-      return res
-        .status(401)
-        .json({ status: "error", msg: "Email o contraseña no válido" });
-    }
-
-    req.session.user = {
-      email,
-      first_name: user.first_name,
-      role: "user",
-    };
-
-    res.status(200).json({ status: "success", payload: req.session.user });
+    res.status(200).json({ status: "success", payload: req.user })
   } catch (error) {
     console.log(error);
     res
@@ -100,24 +79,5 @@ router.get(
     res.status(200).json({ status: "success", payload: req.user });
   }
 );
-
-router.post("/auth", async (req, res) => {
-  const { email, password } = req.body;
-  const user = await userDao.getByEmail(email);
-  // Valida si existe el usuario o si el password no es el mismo que el que tenemos registrado en la base de datos
-  if (!user || !isValidPassword(password, user.password)) {
-    return res
-      .status(401)
-      .json({ status: "error", msg: "Email o contraseña no válido" });
-  }
-
-  // Generamos el token
-  const token = createToken(user);
-
-  // Guardamos el token en una cookie
-  res.cookie("token", token, { httpOnly: true });
-
-  res.status(200).json({ status: "success", payload: { user, token } });
-});
 
 export default router;
