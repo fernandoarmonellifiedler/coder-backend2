@@ -72,15 +72,11 @@ router.get("/logout", async (req, res) => {
   }
 });
 
-router.get("/current", async (req, res) => {
+router.get("/current", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {
-   
-    const token = req.cookies.token;
+    const user = await userDao.getById(req.user.id);
 
-    const validToken = verifyToken(token);
-    if(!validToken) return res.status(401).json({status: "error", msg: "Token no válido"});
-
-    res.status(200).json({ status: "success", payload: validToken });
+    res.status(200).json({ status: "Success", payload: user })
   } catch (error) {
     console.log(error);
     res

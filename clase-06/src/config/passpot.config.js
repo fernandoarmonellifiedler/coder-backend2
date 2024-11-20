@@ -4,10 +4,12 @@ import google from "passport-google-oauth20";
 import jwt from "passport-jwt";
 import { userDao } from "../dao/mongo/user.dao.js";
 import { createHash } from "../utils/hashPassword.js";
+import { cookieExtractor } from "../utils/cookieExtractor.js";
 
 const LocalStrategy = local.Strategy;
 const GoogleStrategy = google.Strategy;
-const JWTStartegy = jwt.Strategy;
+const JWTStrategy = jwt.Strategy;
+const ExtractJWT = jwt.ExtractJwt;
 
 // Función que inicializa todas las estrategias
 export const initializePassport = () => {
@@ -25,7 +27,7 @@ export const initializePassport = () => {
       */
 
       try {
-        const { first_name, last_name, age } = req.body;
+        const { first_name, last_name, age, role } = req.body;
         // validar si el usuario existe
         const user = await userDao.getByEmail(username);
         // Si el usuario existe, retornamos un mensaje de error
@@ -38,6 +40,7 @@ export const initializePassport = () => {
           age,
           email: username,
           password: createHash(password),
+          role: role ? role : "user"
         };
 
         const userRegister = await userDao.create(newUser);
@@ -107,4 +110,19 @@ export const initializePassport = () => {
       }
     )
   );
+
+  // Estrategia JWT
+  passport.use("jwt", new JWTStrategy({
+    jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
+    secretOrKey: "ClaveSecreta"
+  },
+    async (jwt_payload, done) => {
+      try {
+        return done(null, jwt_payload);
+      } catch (error) {
+        return done(error);
+      }
+    }
+  ))
+
 };

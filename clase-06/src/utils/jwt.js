@@ -2,8 +2,8 @@ import jwt from "jsonwebtoken";
 
 // Función que crea el token
 export const createToken = (user) => {
-  const { id, email } = user;
-  const token = jwt.sign({ id, email }, "ClaveSecreta", { expiresIn: "1m" });
+  const { id, email, role } = user;
+  const token = jwt.sign({ id, email, role }, "ClaveSecreta", { expiresIn: "5m" });
   return token;
 };
 
