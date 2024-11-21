@@ -39,6 +39,7 @@ export const initializePassport = () => {
             email,
             password: createHash(password),
             role: role || "user",
+            cart: cart._id
           };
 
           const userCreated = await userDao.create(newUser);
