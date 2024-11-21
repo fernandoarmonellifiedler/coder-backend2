@@ -7,45 +7,65 @@ import { authorization } from "../middlewares/authorization.middleware.js";
 
 const router = Router();
 
+// Ruta para registrar un nuevo usuario
 router.post("/register", passportCall("register"), async (req, res) => {
   try {
-    return res.status(201).json({ status: "success", message: "Usuario registrado" });
+    res.status(201).json({ status: "success", msg: "Usuario registrado" });
   } catch (error) {
-    console.error("Register Error:", error);
-    return res.status(500).json({ status: "error", message: "Error interno del servidor" });
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
   }
 });
 
+// Ruta para iniciar sesión
 router.post("/login", passportCall("login"), async (req, res) => {
   try {
-    // Generar token y almacenarlo en una cookie
+    // Generamos el token y lo guardamos en una cookie
     const token = createToken(req.user);
     res.cookie("token", token, { httpOnly: true });
 
-    return res.status(200).json({ status: "success", payload: req.user });
+    res.status(200).json({ status: "success", payload: req.user });
   } catch (error) {
-    console.error("Login Error:", error);
-    return res.status(500).json({ status: "error", message: "Error interno del servidor" });
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
   }
 });
 
+// Ruta para cerrar sesión
 router.get("/logout", async (req, res) => {
   try {
     req.session.destroy();
-    return res.status(200).json({ status: "success", message: "Sesión cerrada" });
+    res.status(200).json({ status: "success", msg: "Sesión cerrada" });
   } catch (error) {
-    console.error("Logout Error:", error);
-    return res.status(500).json({ status: "error", message: "Error interno del servidor" });
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
   }
 });
 
+// Ruta para obtener los datos del usuario actual
 router.get("/current", passportCall("jwt"), authorization("user"), async (req, res) => {
   try {
     const user = await userDao.getById(req.user.id);
-    return res.status(200).json({ status: "success", payload: user });
+    res.status(200).json({ status: "success", payload: user });
   } catch (error) {
-    console.error("Current User Error:", error);
-    return res.status(500).json({ status: "error", message: "Error interno del servidor" });
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
+  }
+});
+
+// Ruta para autenticar con Google
+router.get("/google", passport.authenticate("google", {
+  scope: [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+  ],
+  session: false,
+}), (req, res) => {
+  try {
+    res.status(200).json({ status: "success", payload: req.user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
   }
 });
 
