@@ -1,91 +1,99 @@
 import { Router } from "express";
 import { checkProductData } from "../middlewares/checkProductData.middleware.js";
 import { productDao } from "../dao/mongo/product.dao.js";
-
+import { isAdmin } from "../middlewares/isAdmin.middleware.js";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+// Ruta para obtener productos con filtros y paginación (solo admin)
+router.get("/", isAdmin, async (req, res) => {
+  const { limit = 10, page = 1, sort = "desc", category, status } = req.query;
+
+  const options = {
+    limit,
+    page,
+    sort: {
+      price: sort === "asc" ? 1 : -1, // Orden ascendente o descendente por precio
+    },
+    learn: true, // Parametro adicional no usado, se asume que es parte de la configuración
+  };
+
   try {
-    const { limit, page, sort, category, status } = req.query;
-
-    const options = {
-      limit: limit || 10,
-      page: page || 1,
-      sort: {
-        price: sort === "asc" ? 1 : -1,
-      },
-      learn: true,
-    };
-
-    // Si nos solicitan por categoría
+    // Filtrado por categoría o estado, si se proporciona
+    let products;
     if (category) {
-      const products = await productDao.getAll({ category }, options);
-      return res.status(200).json({ status: "success", products });
+      products = await productDao.getAll({ category }, options);
+    } else if (status) {
+      products = await productDao.getAll({ status }, options);
+    } else {
+      products = await productDao.getAll({}, options); // Si no hay filtros, obtenemos todos
     }
 
-    if (status) {
-      const products = await productDao.getAll({ status }, options);
-      return res.status(200).json({ status: "success", products });
-    }
-
-    const products = await productDao.getAll({}, options);
     res.status(200).json({ status: "success", products });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "Erro", msg: "Error interno del servidor" });
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
   }
 });
 
+// Ruta para obtener un producto específico por ID
 router.get("/:pid", async (req, res) => {
+  const { pid } = req.params;
   try {
-    const { pid } = req.params;
     const product = await productDao.getById(pid);
-    if (!product) return res.status(404).json({ status: "Error", msg: "Producto no encontrado" });
-
+    if (!product) {
+      return res.status(404).json({ status: "error", msg: "Producto no encontrado" });
+    }
     res.status(200).json({ status: "success", product });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "Erro", msg: "Error interno del servidor" });
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
   }
 });
 
+// Ruta para eliminar un producto por ID
 router.delete("/:pid", async (req, res) => {
+  const { pid } = req.params;
   try {
-    const { pid } = req.params;
     const product = await productDao.deleteOne(pid);
-    if (!product) return res.status(404).json({ status: "Error", msg: "Producto no encontrado" });
-
-    res.status(200).json({ status: "success", msg: `El producto con el id ${pid} fue eliminado` });
+    if (!product) {
+      return res.status(404).json({ status: "error", msg: "Producto no encontrado" });
+    }
+    res.status(200).json({ status: "success", msg: `Producto con ID ${pid} eliminado` });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "Erro", msg: "Error interno del servidor" });
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
   }
 });
 
+// Ruta para actualizar un producto por ID
 router.put("/:pid", async (req, res) => {
-  try {
-    const { pid } = req.params;
-    const productData = req.body;
-    const product = await productDao.update(pid, productData);
-    if (!product) return res.status(404).json({ status: "Error", msg: "Producto no encontrado" });
+  const { pid } = req.params;
+  const productData = req.body;
 
-    res.status(200).json({ status: "success", product });
+  try {
+    const updatedProduct = await productDao.update(pid, productData);
+    if (!updatedProduct) {
+      return res.status(404).json({ status: "error", msg: "Producto no encontrado" });
+    }
+    res.status(200).json({ status: "success", product: updatedProduct });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "Erro", msg: "Error interno del servidor" });
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
   }
 });
 
+// Ruta para crear un nuevo producto
 router.post("/", checkProductData, async (req, res) => {
-  try {
-    const productData = req.body;
-    const product = await productDao.create(productData);
+  const productData = req.body;
 
-    res.status(201).json({ status: "success", product });
+  try {
+    const newProduct = await productDao.create(productData);
+    res.status(201).json({ status: "success", product: newProduct });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "Erro", msg: "Error interno del servidor" });
+    console.error(error);
+    res.status(500).json({ status: "error", msg: "Error interno del servidor" });
   }
 });
+
 export default router;
