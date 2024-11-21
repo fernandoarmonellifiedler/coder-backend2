@@ -1,7 +1,5 @@
 import { Router } from "express";
 import { userDao } from "../dao/mongo/user.dao.js";
-import { checkEmail } from "../middlewares/checkEmail.middleware.js";
-import { createHash, isValidPassword } from "../utils/hashPassword.js";
 import passport from "passport";
 import { createToken, verifyToken } from "../utils/jwt.js";
 import { passportCall } from "../middlewares/passport.middleware.js";
