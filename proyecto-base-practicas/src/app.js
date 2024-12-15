@@ -1,35 +1,15 @@
 import express from "express";
-import routes from "./routes/index.js";
-import __dirname from "./dirname.js";
-import handlebars from "express-handlebars";
-import { Server } from "socket.io";
-import viewsRoutes from "./routes/views.routes.js";
-import { connectMongoDB } from "./config/mongoDB.config.js";
+import mongoose from "mongoose";
+import router from "./router/index.router.js";
 
 const app = express();
+mongoose.connect("mongodb://localhost:27017/clase00")
+console.log("Mongo db connect");
 
-connectMongoDB();
-
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.engine("handlebars", handlebars.engine()); // Inicia el motor del la plantilla
-app.set("views", __dirname + "/views"); // Indicamos que ruta se encuentras las vistas
-app.set("view engine", "handlebars"); // Indicamos con que motor vamos a utilizar las vistas
-app.use(express.static("public"));
 
-// Rutas de la api
-app.use("/api", routes);
+app.use("/api", router)
 
-// Ruta de las vistas
-app.use("/", viewsRoutes)
-
-const httpServer = app.listen(8080, () => {
-  console.log("Servidor escuchando en el puerto 8080");
-});
-
-// Configuramos socket
-export const io = new Server(httpServer);
-
-io.on("connection", (socket) => {
-  console.log("Nuevo usuario Conectado");
+app.listen(8080, () => {
+  console.log("Server on port 8080");
 });
