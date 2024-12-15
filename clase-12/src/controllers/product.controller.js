@@ -1,6 +1,6 @@
 import { productDao } from "../dao/mongo/product.dao.js";
 import { ProductResponseDto } from "../dto/productResponse.dto.js";
-import { productService } from "../services/product.services.js";
+import { productService } from "../services/product.service.js";
 
 export class ProductController {
   async getAll(req, res) {
