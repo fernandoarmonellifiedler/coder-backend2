@@ -7,6 +7,7 @@ import viewsRoutes from "./routes/views.routes.js";
 import { connectMongoDB } from "./config/mongoDB.config.js";
 import session from "express-session";
 import { initializePassport } from "./config/passport.config.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use(
     saveUninitialized: true, // Guarde la session
   })
 );
-
+app.use(cookieParser("secretKey"));
 // Rutas de la api
 app.use("/api", routes);
 
