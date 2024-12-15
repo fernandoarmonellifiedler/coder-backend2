@@ -6,7 +6,7 @@ import { isAdmin } from "../middlewares/isAdmin.middleware.js";
 const productController = new ProductController();
 const router = Router();
 
-router.get("/", isAdmin, productController.getAll);
+router.get("/",  productController.getAll);
 
 router.get("/:pid", productController.getById);
 
