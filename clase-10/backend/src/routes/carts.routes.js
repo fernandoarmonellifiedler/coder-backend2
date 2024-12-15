@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { CartController } from "../controllers/cart.controller.js";
+import { cartController } from "../controllers/cart.controller.js";
 import { authorization } from "../middlewares/authorization.middleware.js";
 
-const cartController = new CartController();
+// const cartController = new CartController();
 const router = Router();
 
 router.post("/", authorization("admin"), cartController.createCart);

@@ -1,3 +1,4 @@
+import { createToken } from "../utils/jwt.js";
 
 export class SessionController {
   async register (req, res) {

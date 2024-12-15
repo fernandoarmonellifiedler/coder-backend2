@@ -19,6 +19,7 @@ router.get("/logout", sessionController.logout);
 
 router.get("/current", passportCall("jwt"), authorization("user"), async (req, res) => {
   try {
+    
     const user = await userDao.getById(req.user.id);
     res.status(200).json({ status: "success", payload: user });
   } catch (error) {
