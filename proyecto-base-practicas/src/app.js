@@ -6,10 +6,12 @@ import { Server } from "socket.io";
 import viewsRoutes from "./routes/views.routes.js";
 import { connectMongoDB } from "./config/mongoDB.config.js";
 import session from "express-session";
+import { initializePassport } from "./config/passport.config.js";
 
 const app = express();
 
 connectMongoDB();
+initializePassport();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
