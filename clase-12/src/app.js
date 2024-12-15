@@ -8,6 +8,7 @@ import routes from "./routes/index.js";
 import envsConfig from "./config/envs.config.js";
 import cors from "cors";
 
+
 const app = express();
 
 connectMongoDB();
