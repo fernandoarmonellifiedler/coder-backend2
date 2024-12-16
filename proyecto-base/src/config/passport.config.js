@@ -6,44 +6,49 @@ import { userDao } from "../dao/mongo/user.dao.js";
 import { cartDao } from "../dao/mongo/cart.dao.js";
 import { createHash, isValidPassword } from "../utils/hashPassword.js";
 import { cookieExtractor } from "../utils/cookieExtractor.js";
+import envsConfig from "./envs.config.js";
 
 const LocalStrategy = local.Strategy;
 const GoogleStrategy = google.Strategy;
 const JWTStrategy = jwt.Strategy;
 const ExtractJWT = jwt.ExtractJwt;
 
+// Función que inicializa todas las estrategias
 export const initializePassport = () => {
   // Estrategia de registro local
   passport.use(
     "register",
     new LocalStrategy(
       { passReqToCallback: true, usernameField: "email" },
-      async (req, email, password, done) => {
+      async (req, username, password, done) => {
         try {
           const { first_name, last_name, age, role } = req.body;
 
           // Verificar si el usuario ya existe
-          const existingUser = await userDao.getByEmail(email);
+          const existingUser = await userDao.getByEmail(username);
+
+          // Si el usuario existe, retornamos un mensaje de error
           if (existingUser) {
-            return done(null, false, { message: "El usuario ya existe" });
+            return done(null, false, { message: "El usuario ya existe" }); // done es equivalente a un next() en los middlewares
           }
 
           // Crear carrito para el nuevo usuario
           const cart = await cartDao.create();
 
-          // Crear nuevo usuario
+          // Si el usuario no existe creamos un nuevo usuario
           const newUser = {
             first_name,
             last_name,
             age,
-            email,
-            password: createHash(password),
-            role: role || "user",
+            email: username,
+            password: createHash(password), // Encriptar el password
+            role: role ? role : "user",
             cart: cart._id
           };
 
-          const userCreated = await userDao.create(newUser);
-          return done(null, userCreated);
+          const userRegister = await userDao.create(newUser);
+
+          return done(null, userRegister);
         } catch (error) {
           return done(error);
         }
@@ -54,64 +59,69 @@ export const initializePassport = () => {
   // Estrategia de inicio de sesión local
   passport.use(
     "login",
-    new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
+    new LocalStrategy({ usernameField: "email" }, async (username, password, done) => {
       try {
-        const user = await userDao.getByEmail(email);
+        const user = await userDao.getByEmail(username);
 
+        // Valida si existe el usuario o si el password no es el mismo que el que tenemos registrado en la base de datos
         if (!user || !isValidPassword(password, user.password)) {
           return done(null, false, { message: "Email o contraseña inválido" });
         }
 
-        return done(null, user);
+        done(null, user);
       } catch (error) {
-        return done(error);
+        done(error);
       }
     })
   );
 
   // Serialización y deserialización de usuarios
-  passport.serializeUser((user, done) => done(null, user._id));
+  passport.serializeUser((user, done) => {
+    done(null, user._id);
+  });
 
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await userDao.getById(id);
-      return done(null, user);
+      done(null, user);
     } catch (error) {
-      return done(error);
+      done(error);
     }
   });
 
-  // Estrategia de autenticación con Google
+  // Estrategia de google
+
   passport.use(
     "google",
     new GoogleStrategy(
       {
-        clientID: "557836612939-t2sua3gqdguhk94shnnapangmkhcse1q.apps.googleusercontent.com", // Agrega tu clientID
-        clientSecret: "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", // Agrega tu clientSecret
+        clientID: envsConfig.GOOGLE_CLIENT_ID,
+        clientSecret: envsConfig.GOOGLE_CLIENT_SECRET,
+
         callbackURL: "http://localhost:8080/api/sessions/google",
       },
-      async (accessToken, refreshToken, profile, done) => {
+      async (accessToken, refreshToken, profile, cb) => {
         try {
-          const { name, emails } = profile;
-          const email = emails[0]?.value;
+          const { id, name, emails } = profile;
 
-          const existingUser = await userDao.getByEmail(email);
+          const user = {
+            first_name: name.givenName,
+            last_name: name.familyName,
+            email: emails[0].value,
+          };
+
+          const existingUser = await userDao.getByEmail(user.email);
 
           // Si el usuario ya existe
           if (existingUser) {
-            return done(null, existingUser);
+            return cb(null, existingUser);
           }
 
-          // Crear un nuevo usuario
-          const newUser = await userDao.create({
-            first_name: name?.givenName || "",
-            last_name: name?.familyName || "",
-            email,
-          });
-
-          return done(null, newUser);
+          // En caso que el usuario con ese email no este registrado, lo hacemos en este paso
+          const newUser = await userDao.create(user);
+          return cb(null, newUser);
         } catch (error) {
-          return done(error);
+          return cb(error);
         }
       }
     )
@@ -125,9 +135,9 @@ export const initializePassport = () => {
         jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
         secretOrKey: "ClaveSecreta",
       },
-      async (jwtPayload, done) => {
+      async (jwk_payload, done) => {
         try {
-          return done(null, jwtPayload);
+          return done(null, jwk_payload);
         } catch (error) {
           return done(error);
         }

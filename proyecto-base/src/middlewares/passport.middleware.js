@@ -2,19 +2,13 @@ import { request, response } from "express";
 import passport from "passport";
 
 export const passportCall = (strategy) => {
-	return (req = request, res = response, next) => {
-		passport.authenticate(strategy, (error, user, info) => {
-			if (error) {
-				return next(error);
-			}
-			if (!user) {
-				return res.status(401).json({ 
-					status: "error", 
-					message: info?.message || "Unauthorized" 
-				});
-			}
-			req.user = user;
-			return next();
-		})(req, res, next);
-	};
+  return async (req = request, res = response, next) => {
+    passport.authenticate(strategy, (err, user, info) => {
+      if (err) return next(err);
+      if (!user) return res.status(401).json({ status: "error", msg: info.message });
+
+      req.user = user;
+      next();
+    })(req, res, next);
+  };
 };

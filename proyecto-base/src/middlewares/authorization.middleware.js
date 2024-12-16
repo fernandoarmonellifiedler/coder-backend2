@@ -1,24 +1,24 @@
 import { request, response } from "express";
 
 export const authorization = (role) => {
-  return (req = request, res = response, next) => {
-    // Verifica si el usuario está autenticado
-    if (!req.user) {
+  return async (req = request, res = response, next) => {
+    // Validamos que haya una session de usuario
+    if(!req.user) {
       return res.status(401).json({
         status: "error",
-        message: "Unauthorized"
+        msg: "Unauthorized"
       });
     }
 
     // Verifica si el rol del usuario coincide con el rol requerido
-    if (req.user.role !== role) {
+    if(req.user.role !== role) {
       return res.status(403).json({
         status: "error",
-        message: "Access denied"
+        msg: "No permission"
       });
     }
 
     // Continua al siguiente middleware
-    return next();
+    next();
   };
 };

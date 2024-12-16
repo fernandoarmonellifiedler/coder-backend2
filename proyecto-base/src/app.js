@@ -5,6 +5,7 @@ import { connectMongoDB } from "./config/mongoDB.config.js";
 import session from "express-session";
 import { initializePassport } from "./config/passport.config.js";
 import cookieParser from "cookie-parser";
+import envsConfig from "./config/envs.config.js";
 
 // Inicializamos la aplicación Express
 const app = express();
@@ -17,12 +18,12 @@ initializePassport();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
-app.use(cookieParser("secretKey")); // Configuración para las cookies
+app.use(cookieParser(envsConfig.SECRET_KEY)); // Configuración para las cookies
 
 // Configuración de la sesión
 app.use(
   session({
-    secret: "secret", // Clave secreta para la sesión
+    secret: envsConfig.SECRET_KEY, // Clave secreta para la sesión
     resave: true, // Mantener la sesión activa
     saveUninitialized: true, // Guardar la sesión aunque no haya cambios
   })
@@ -32,8 +33,8 @@ app.use(
 app.use("/api", routes);
 
 // Iniciamos el servidor HTTP
-const httpServer = app.listen(8080, () => {
-  console.log("Servidor escuchando en el puerto 8080");
+const httpServer = app.listen(envsConfig.PORT, () => {
+  console.log(`Servidor escuchando en el puerto ${envsConfig.PORT}`);
 });
 
 // Configuración de WebSockets (Socket.io)

@@ -1,6 +1,8 @@
 export const cookieExtractor = (req) => {
-  if (req?.cookies?.token) {
-    return req.cookies.token;
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies.token;
   }
-  return null;
+
+  return token;
 };
