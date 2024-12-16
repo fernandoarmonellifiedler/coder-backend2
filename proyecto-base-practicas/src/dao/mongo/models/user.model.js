@@ -19,7 +19,10 @@ const userSchema = new mongoose.Schema({
   age: {
     type: Number,
   },
+  role: {
+    type: String,
+    default: "user",
+  },
 });
-
 
 export const userModel = mongoose.model(userCollection, userSchema);
