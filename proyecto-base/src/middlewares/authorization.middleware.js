@@ -7,7 +7,6 @@ export const authorization = (role) => {
     // Verifica si el rol del usuario coincide con el rol requerido
     if(req.user.role !== role) return res.status(403).json({status: "error", msg: "No permission"})
 
-    // Continua al siguiente middleware
     next();
   }
 }
