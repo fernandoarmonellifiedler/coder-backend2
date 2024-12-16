@@ -18,42 +18,36 @@ export const initializePassport = () => {
   // Estrategia de registro local
   passport.use(
     "register",
-    new LocalStrategy(
-      { passReqToCallback: true, usernameField: "email" },
-      async (req, username, password, done) => {
-        try {
-          const { first_name, last_name, age, role } = req.body;
+    new LocalStrategy({ passReqToCallback: true, usernameField: "email" }, async (req, username, password, done) => {
+      try {
+        const { first_name, last_name, age, role } = req.body;
+        // validar si el usuario existe
+        const user = await userDao.getByEmail(username);
 
-          // Verificar si el usuario ya existe
-          const existingUser = await userDao.getByEmail(username);
+        // Si el usuario existe, retornamos un mensaje de error
+        if (user) return done(null, false, { message: "El usuario ya existe" }); // done es equivalente a un next() en los middlewares
 
-          // Si el usuario existe, retornamos un mensaje de error
-          if (existingUser) {
-            return done(null, false, { message: "El usuario ya existe" }); // done es equivalente a un next() en los middlewares
-          }
+        // Creamos un carrito nuevo para el usuario
+        const cart = await cartDao.create();
 
-          // Crear carrito para el nuevo usuario
-          const cart = await cartDao.create();
+        // Si el usuario no existe creamos un nuevo usuario
+        const newUser = {
+          first_name,
+          last_name,
+          age,
+          email: username,
+          password: createHash(password), // Encriptar el password
+          role: role ? role : "user",
+          cart: cart._id,
+        };
 
-          // Si el usuario no existe creamos un nuevo usuario
-          const newUser = {
-            first_name,
-            last_name,
-            age,
-            email: username,
-            password: createHash(password), // Encriptar el password
-            role: role ? role : "user",
-            cart: cart._id
-          };
+        const userRegister = await userDao.create(newUser);
 
-          const userRegister = await userDao.create(newUser);
-
-          return done(null, userRegister);
-        } catch (error) {
-          return done(error);
-        }
+        return done(null, userRegister);
+      } catch (error) {
+        return done(error);
       }
-    )
+    })
   );
 
   // Estrategia de inicio de sesión local

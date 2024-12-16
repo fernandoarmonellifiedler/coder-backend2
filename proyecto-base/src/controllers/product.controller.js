@@ -1,4 +1,5 @@
 import { productDao } from "../dao/mongo/product.dao.js";
+import { productService } from "../services/product.services.js";
 
 export class ProductController {
   async getAll(req, res) {
@@ -36,9 +37,8 @@ export class ProductController {
   async getById(req, res) {
     try {
       const { pid } = req.params;
-      const product = await productDao.getById(pid);
+      const product = await productService.getById(pid);
       if (!product) return res.status(404).json({ status: "Error", msg: "Producto no encontrado" });
-
       res.status(200).json({ status: "success", product });
     } catch (error) {
       console.log(error);
@@ -49,7 +49,7 @@ export class ProductController {
   async deleteOne(req, res) {
     try {
       const { pid } = req.params;
-      const product = await productDao.deleteOne(pid);
+      const product = await productService.deleteOne(pid);
       if (!product) return res.status(404).json({ status: "Error", msg: "Producto no encontrado" });
 
       res.status(200).json({ status: "success", msg: `El producto con el id ${pid} fue eliminado` });

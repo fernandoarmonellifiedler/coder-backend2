@@ -9,7 +9,7 @@ class CartDao {
 
   // Método para obtener un carrito por su ID
   async getById(id) {
-    const cart = await cartModel.findById(id).populate("products.product");
+    const cart = await cartModel.findById(id);
     return cart;
   }
 
@@ -31,20 +31,6 @@ class CartDao {
     return cart;
   }
 
-  // Método para agregar un producto a un carrito
-  async addProductToCart(cid, pid) {
-    const cart = await cartModel.findById(cid);
-
-    const productInCart = cart.products.find((element) => element.product == pid);
-    if (productInCart) {
-      productInCart.quantity++;
-    } else {
-      cart.products.push({ product: pid, quantity: 1 });
-    }
-
-    await cart.save(); // Guardamos los cambios realizado en la base de datos de mongo
-    return cart;
-  }
 
   // Método para eliminar un producto de un carrito
   async deleteProductToCart(cid, pid) {

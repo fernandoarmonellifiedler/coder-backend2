@@ -1,3 +1,4 @@
+import { createToken } from "../utils/jwt.js";
 
 export class SessionController {
   async register (req, res) {
@@ -13,10 +14,8 @@ export class SessionController {
     try {
       // Generamos el token
       const token = createToken(req.user);
-  
       // Guardamos el token en una cookie
       res.cookie("token", token, { httpOnly: true });
-  
       res.status(200).json({ status: "success", payload: req.user });
     } catch (error) {
       console.log(error);

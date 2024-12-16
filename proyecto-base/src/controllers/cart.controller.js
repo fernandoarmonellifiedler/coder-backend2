@@ -1,5 +1,6 @@
 import { cartDao } from "../dao/mongo/cart.dao.js";
 import { productDao } from "../dao/mongo/product.dao.js";
+import { cartService } from "../services/cart.service.js";
 
 export class CartController {
   async createCart(req, res) {
@@ -31,12 +32,10 @@ export class CartController {
       const { cid, pid } = req.params;
       const product = await productDao.getById(pid);
       if (!product) return res.status(404).json({ status: "Error", msg: `No se encontró el producto con el id ${pid}` });
-      const cart = await cartDao.getById(cid);
+      const cart = await cartService.addProductToCart(cid, pid);
       if (!cart) return res.status(404).json({ status: "Error", msg: `No se encontró el carrito con el id ${cid}` });
   
-      const cartUpdate = await cartDao.addProductToCart(cid, pid);
-  
-      res.status(200).json({ status: "success", payload: cartUpdate });
+      res.status(200).json({ status: "success", payload: cart });
     } catch (error) {
       console.log(error);
       res.status(500).json({ status: "Erro", msg: "Error interno del servidor" });
@@ -92,3 +91,5 @@ export class CartController {
     }
   }
 }
+
+export const cartController = new CartController();

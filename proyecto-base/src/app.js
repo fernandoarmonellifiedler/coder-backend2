@@ -4,8 +4,9 @@ import { Server } from "socket.io";
 import { connectMongoDB } from "./config/mongoDB.config.js";
 import session from "express-session";
 import { initializePassport } from "./config/passport.config.js";
-import cookieParser from "cookie-parser";
+
 import envsConfig from "./config/envs.config.js";
+import cors from "cors";
 
 // Inicializamos la aplicación Express
 const app = express();
@@ -17,10 +18,9 @@ initializePassport();
 // Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static("public"));
-app.use(cookieParser(envsConfig.SECRET_KEY)); // Configuración para las cookies
+app.use(cors());
 
-// Configuración de la sesión
+app.use(express.static("public"));
 app.use(
   session({
     secret: envsConfig.SECRET_KEY, // Clave secreta para la sesión
