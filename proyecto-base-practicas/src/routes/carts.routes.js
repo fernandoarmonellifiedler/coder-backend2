@@ -6,15 +6,17 @@ import { passportCall } from "../middlewares/passport.middleware.js";
 // const cartController = new CartController();
 const router = Router();
 
-router.post("/", authorization("admin"), cartController.createCart);
+router.post("/", passportCall('jwt'), authorization("admin"), cartController.createCart);
 
-router.get("/:cid", authorization("user"), cartController.getCartById);
+router.get("/:cid",passportCall('jwt'),  authorization("user"), cartController.getCartById);
 
-router.post("/:cid/product/:pid", cartController.addProductToCart);
+router.post("/:cid/product/:pid",passportCall('jwt'), authorization("user"), cartController.addProductToCart);
 
-router.delete("/:cid/product/:pid", cartController.deleteProductToCart);
+router.post("/:cid/purchase",passportCall('jwt'), authorization("user"), cartController.purchaseCart);
 
-router.put("/:cid/product/:pid", authorization("user"), cartController.updateQuantityProductInCart);
+router.delete("/:cid/product/:pid", passportCall('jwt'), authorization("user"), cartController.deleteProductToCart);
+
+router.put("/:cid/product/:pid", passportCall('jwt'), authorization("user"), cartController.updateQuantityProductInCart);
 
 router.delete("/:cid", authorization("admin"), cartController.clearProductsToCart);
 
