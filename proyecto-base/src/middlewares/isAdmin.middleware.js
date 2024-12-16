@@ -1,25 +1,38 @@
-import { request, response } from "express";
+import { request, response } from "express"; // Import request and response objects from Express.
 
 export const isAdmin = async (req = request, res = response, next) => {
+  // Middleware to check if the user is logged in and has administrator privileges.
   try {
-    const user = req.session.user;
+    const user = req.session.user; // Retrieve the user information from the session.
 
-    // Verificamos si el usuario está logueado
-    if (!user)
-      return res
-        .status(401)
-        .json({ status: "error", msg: "Usuario no logueado" });
+    // Check if the user is logged in.
+    if (!user) {
+      // If not logged in, respond with a 401 Unauthorized status.
+      return res.status(401).json({ 
+        status: "error", 
+        msg: "Usuario no logueado" // Spanish: User not logged in.
+      });
+    }
 
-    // Verificamos si el usuario tiene rol de administrador
-    if (user.role !== "admin")
-      return res
-        .status(403)
-        .json({ status: "error", msg: "Usuario no autorizado" });
+    // Check if the user has admin role.
+    if (user.role !== "admin") {
+      // If the user is not authorized, respond with a 403 Forbidden status.
+      return res.status(403).json({ 
+        status: "error", 
+        msg: "Usuario no autorizado" // Spanish: User not authorized.
+      });
+    }
 
-    // Si el usuario es admin, continuamos con la solicitud
+    // If the user is logged in and is an admin, proceed to the next middleware or route handler.
     next();
   } catch (error) {
+    // Log the error for debugging purposes.
     console.log(error);
-    res.status(500).json({ status: "Error", msg: "Error interno del servidor" });
+    
+    // Respond with a 500 Internal Server Error status for unexpected errors.
+    res.status(500).json({ 
+      status: "error", 
+      msg: "Error interno del servidor" // Spanish: Internal server error.
+    });
   }
 };

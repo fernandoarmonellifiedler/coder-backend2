@@ -1,11 +1,11 @@
 import bycrypt from "bcrypt";
 
-// Función que hashea la contraseña
+// Function that hashes the password
 export const createHash = (password) => {
   return bycrypt.hashSync(password, bycrypt.genSaltSync(10));
 };
 
-// Función que valida la contraseña ingresa por el usuario y la contraseña encriptada
+// Function that validates the password entered by the user against the encrypted password
 export const isValidPassword = (password, userPassword) => {
-  return bycrypt.compareSync(password, userPassword); // compara las dos contraseñas y devuelve un true o false
+  return bycrypt.compareSync(password, userPassword); // Compares the two passwords and returns true or false
 };

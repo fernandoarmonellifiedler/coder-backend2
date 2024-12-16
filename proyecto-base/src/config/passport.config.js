@@ -1,138 +1,133 @@
-import passport from "passport";
-import local from "passport-local";
-import google from "passport-google-oauth20";
-import jwt from "passport-jwt";
-import { userDao } from "../dao/mongo/user.dao.js";
-import { cartDao } from "../dao/mongo/cart.dao.js";
-import { createHash, isValidPassword } from "../utils/hashPassword.js";
-import { cookieExtractor } from "../utils/cookieExtractor.js";
-import envsConfig from "./envs.config.js";
+import passport from "passport"; // Import passport for authentication management.
+import local from "passport-local"; // Import local strategy for username/password login.
+import google from "passport-google-oauth20"; // Import Google OAuth strategy.
+import jwt from "passport-jwt"; // Import JWT strategy for token-based authentication.
+import { userDao } from "../dao/mongo/user.dao.js"; // User data access object for database operations.
+import { cartDao } from "../dao/mongo/cart.dao.js"; // Cart data access object for database operations.
+import { createHash, isValidPassword } from "../utils/hashPassword.js"; // Utility functions for password hashing and validation.
+import { cookieExtractor } from "../utils/cookieExtractor.js"; // Utility to extract JWT from cookies.
+import envsConfig from "./envs.config.js"; // Environment configuration for sensitive data.
 
-const LocalStrategy = local.Strategy;
-const GoogleStrategy = google.Strategy;
-const JWTStrategy = jwt.Strategy;
-const ExtractJWT = jwt.ExtractJwt;
+const LocalStrategy = local.Strategy; // Alias for local strategy.
+const GoogleStrategy = google.Strategy; // Alias for Google strategy.
+const JWTStrategy = jwt.Strategy; // Alias for JWT strategy.
+const ExtractJWT = jwt.ExtractJwt; // Extractor for JWT payload.
 
-// Función que inicializa todas las estrategias
 export const initializePassport = () => {
-  // Estrategia de registro local
+  // Initializes and configures passport strategies.
+
+  // Local registration strategy
   passport.use(
     "register",
     new LocalStrategy({ passReqToCallback: true, usernameField: "email" }, async (req, username, password, done) => {
       try {
-        const { first_name, last_name, age, role } = req.body;
-        // validar si el usuario existe
-        const user = await userDao.getByEmail(username);
+        const { first_name, last_name, age, role } = req.body; // Destructure user details from the request body.
 
-        // Si el usuario existe, retornamos un mensaje de error
-        if (user) return done(null, false, { message: "El usuario ya existe" }); // done es equivalente a un next() en los middlewares
+        // Check if the user already exists
+        const existingUser = await userDao.getByEmail(username);
+        if (existingUser) return done(null, false, { message: "El usuario ya existe" }); // User already exists.
 
-        // Creamos un carrito nuevo para el usuario
+        // Create a new cart for the user
         const cart = await cartDao.create();
 
-        // Si el usuario no existe creamos un nuevo usuario
+        // Create a new user object
         const newUser = {
           first_name,
           last_name,
           age,
           email: username,
-          password: createHash(password), // Encriptar el password
-          role: role ? role : "user",
-          cart: cart._id,
+          password: createHash(password), // Encrypt the password.
+          role: role || "user", // Default role to "user" if not provided.
+          cart: cart._id, // Associate the new cart with the user.
         };
 
-        const userRegister = await userDao.create(newUser);
-
-        return done(null, userRegister);
+        const registeredUser = await userDao.create(newUser); // Save the new user in the database.
+        return done(null, registeredUser); // Successfully created user.
       } catch (error) {
-        return done(error);
+        return done(error); // Handle any errors during registration.
       }
     })
   );
 
-  // Estrategia de inicio de sesión local
+  // Local login strategy
   passport.use(
     "login",
     new LocalStrategy({ usernameField: "email" }, async (username, password, done) => {
       try {
-        const user = await userDao.getByEmail(username);
-
-        // Valida si existe el usuario o si el password no es el mismo que el que tenemos registrado en la base de datos
+        const user = await userDao.getByEmail(username); // Fetch user by email.
+        
+        // Validate user's existence and password match
         if (!user || !isValidPassword(password, user.password)) {
-          return done(null, false, { message: "Email o contraseña inválido" });
+          return done(null, false, { message: "Email o contraseña inválido" }); // Invalid email or password.
         }
-
-        done(null, user);
+        
+        done(null, user); // Successfully authenticated user.
       } catch (error) {
-        done(error);
+        done(error); // Handle any errors during login.
       }
     })
   );
 
-  // Serialización y deserialización de usuarios
+  // User serialization and deserialization
   passport.serializeUser((user, done) => {
-    done(null, user._id);
+    done(null, user._id); // Serialize the user ID for session management.
   });
 
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await userDao.getById(id);
-      done(null, user);
+      const user = await userDao.getById(id); // Fetch the user by ID.
+      done(null, user); // Successfully deserialized the user.
     } catch (error) {
-      done(error);
+      done(error); // Handle errors in deserialization.
     }
   });
 
-  // Estrategia de google
+  // Google authentication strategy
   passport.use(
     "google",
     new GoogleStrategy(
       {
-        clientID: envsConfig.GOOGLE_CLIENT_ID,
-        clientSecret: envsConfig.GOOGLE_CLIENT_SECRET,
-
-        callbackURL: "https://localhost:8080/api/sessions/google",
+        clientID: envsConfig.GOOGLE_CLIENT_ID, // Google client ID from environment config.
+        clientSecret: envsConfig.GOOGLE_CLIENT_SECRET, // Google client secret from environment config.
+        callbackURL: "https://localhost:8080/api/sessions/google", // Redirect URL after authentication.
       },
       async (accessToken, refreshToken, profile, cb) => {
         try {
-          const { id, name, emails } = profile;
-
+          const { id, name, emails } = profile; // Destructure profile information.
           const user = {
-            first_name: name.givenName,
-            last_name: name.familyName,
-            email: emails[0].value,
+            first_name: name.givenName, // User's first name.
+            last_name: name.familyName, // User's last name.
+            email: emails[0].value, // User's email.
           };
 
-          const existingUser = await userDao.getByEmail(user.email);
-
-          // Si el usuario ya existe
+          const existingUser = await userDao.getByEmail(user.email); // Check if the user already exists.
           if (existingUser) {
-            return cb(null, existingUser);
+            return cb(null, existingUser); // User already exists.
           }
 
-          // En caso que el usuario con ese email no este registrado, lo hacemos en este paso
-          const newUser = await userDao.create(user);
-          return cb(null, newUser);
+          // Register the new user if they do not exist
+          const newUser = await userDao.create(user); // Create new user in the database.
+          return cb(null, newUser); // Successfully registered new user.
         } catch (error) {
-          return cb(error);
+          return cb(error); // Handle any errors during Google authentication.
         }
       }
     )
   );
 
-  // Estrategia de autenticación con JWT
+  // JWT authentication strategy
   passport.use(
     "jwt",
     new JWTStrategy(
       {
-        jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
-        secretOrKey: envsConfig.JWT_KEY,
+        jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]), // Extract JWT from cookies.
+        secretOrKey: envsConfig.JWT_KEY, // Secret key for validating the token.
       },
-      async (jwk_payload, done) => {
+      async (jw_payload, done) => {
         try {
-          return done(null, jwk_payload);
+          return done(null, jw_payload); // Successfully authenticated using JWT.
         } catch (error) {
-          return done(error);
+          return done(error); // Handle errors during JWT authentication.
         }
       }
     )

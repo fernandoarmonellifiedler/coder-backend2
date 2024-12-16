@@ -1,29 +1,58 @@
-import { Router } from "express";
-import { cartController } from "../controllers/cart.controller.js";
-import { authorization } from "../middlewares/authorization.middleware.js";
-import { passportCall } from "../middlewares/passport.middleware.js";
+import { Router } from "express"; // Import the Router from Express.
+import { cartController } from "../controllers/cart.controller.js"; // Import the cart controller.
+import { authorization } from "../middlewares/authorization.middleware.js"; // Import the authorization middleware.
+import { passportCall } from "../middlewares/passport.middleware.js"; // Import the Passport middleware.
 
 const router = Router();
 
-// Crear un carrito nuevo (solo admins)
-router.post("/", passportCall('jwt'), authorization("admin"), cartController.createCart);
+// Create a new cart (admins only)
+router.post("/",
+  passportCall('jwt'),
+  authorization("admin"),
+  cartController.createCart
+);
 
-// Obtener carrito por ID (solo usuarios autorizados)
-router.get("/:cid", passportCall('jwt'), authorization("user"), cartController.getCartById);
+// Get cart by ID (authorized users only)
+router.get("/:cid",
+  passportCall('jwt'),
+  authorization("user"),
+  cartController.getCartById
+);
 
-// Añadir producto al carrito
-router.post("/:cid/product/:pid", passportCall('jwt'), authorization("user"), cartController.addProductToCart);
+// Add product to cart
+router.post("/:cid/product/:pid",
+  passportCall('jwt'),
+  authorization("user"),
+  cartController.addProductToCart
+);
 
-// Comprar productos del carrito
-router.post("/:cid/purchase", passportCall('jwt'), authorization("user"), cartController.purchaseCart);
+// Purchase products in the cart
+router.post("/:cid/purchase",
+  passportCall('jwt'),
+  authorization("user"),
+  cartController.purchaseCart
+);
 
-// Eliminar producto del carrito
-router.delete("/:cid/product/:pid", passportCall('jwt'), authorization("user"), cartController.deleteProductToCart);
+// Remove product from cart
+router.delete("/:cid/product/:pid",
+  passportCall('jwt'),
+  authorization("user"),
+  cartController.deleteProductToCart
+);
 
-// Actualizar cantidad de producto en el carrito (solo usuarios autorizados)
-router.put("/:cid/product/:pid", passportCall('jwt'), authorization("user"), cartController.updateQuantityProductInCart);
+// Update quantity of a product in the cart (authorized users only)
+router.put("/:cid/product/:pid",
+  passportCall('jwt'),
+  authorization("user"),
+  cartController.updateQuantityProductInCart
+);
 
-// Eliminar todos los productos de un carrito (solo admins)
-router.delete("/:cid", authorization("admin"), cartController.clearProductsToCart);
+// Clear all products from a cart (admins only)
+router.delete("/:cid",
+  passportCall('jwt'),
+  authorization("admin"),
+  cartController.clearProductsToCart
+);
 
+// Export the router for use in the application
 export default router;
