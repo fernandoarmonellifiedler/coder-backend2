@@ -10,7 +10,7 @@ export const isAdmin = async (req = request, res = response, next) => {
       // If not logged in, respond with a 401 Unauthorized status.
       return res.status(401).json({ 
         status: "error", 
-        msg: "Usuario no logueado" // Spanish: User not logged in.
+        msg: "User not logged in"
       });
     }
 
@@ -19,7 +19,7 @@ export const isAdmin = async (req = request, res = response, next) => {
       // If the user is not authorized, respond with a 403 Forbidden status.
       return res.status(403).json({ 
         status: "error", 
-        msg: "Usuario no autorizado" // Spanish: User not authorized.
+        msg: "User not authorized"
       });
     }
 
@@ -32,7 +32,7 @@ export const isAdmin = async (req = request, res = response, next) => {
     // Respond with a 500 Internal Server Error status for unexpected errors.
     res.status(500).json({ 
       status: "error", 
-      msg: "Error interno del servidor" // Spanish: Internal server error.
+      msg: " Internal server error"
     });
   }
 };

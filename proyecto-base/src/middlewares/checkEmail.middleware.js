@@ -13,7 +13,7 @@ export const checkEmail = async (req = request, res = response, next) => {
       // If a user is found, respond with a 400 Bad Request status indicating the email is already in use.
       return res.status(400).json({
         status: "error",
-        msg: `El usuario con el email ${email} ya existe`, // Spanish: The user with the email already exists.
+        msg: `The user with the email ${email} already exists`,
       });
     }
 
@@ -24,6 +24,6 @@ export const checkEmail = async (req = request, res = response, next) => {
     console.log(error);
     
     // Respond with a 500 Internal Server Error status for any unexpected errors.
-    res.status(500).json({ status: "error", msg: "Error interno del servidor" }); // Spanish: Internal server error.
+    res.status(500).json({ status: "error", msg: "Internal server error" });
   }
 };

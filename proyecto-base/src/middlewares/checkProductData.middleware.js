@@ -24,7 +24,7 @@ export const checkProductData = async (req = request, res = response, next) => {
       // If a product with the same code is found, respond with a 400 Bad Request status.
       return res.status(400).json({ 
         status: "error", 
-        msg: `El producto con el código ${code} ya existe` // Spanish: The product with the code already exists.
+        msg: `The product with the code ${code} already exists`
       });
     }
 
@@ -34,7 +34,7 @@ export const checkProductData = async (req = request, res = response, next) => {
       // If any required field is missing, respond with a 400 Bad Request status.
       return res.status(400).json({ 
         status: "error", 
-        msg: "Todos los datos son obligatorios" // Spanish: All fields are mandatory.
+        msg: "All fields are mandatory"
       });
     }
 
@@ -45,6 +45,6 @@ export const checkProductData = async (req = request, res = response, next) => {
     console.log(error);
     
     // Respond with a 500 Internal Server Error status for unexpected errors.
-    res.status(500).json({ status: "error", msg: "Error interno del servidor" }); // Spanish: Internal server error.
+    res.status(500).json({ status: "error", msg: "Internal server error" });
   }
 };
