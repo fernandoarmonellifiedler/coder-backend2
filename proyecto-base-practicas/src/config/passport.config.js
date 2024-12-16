@@ -3,8 +3,11 @@ import local from "passport-local";
 import google from "passport-google-oauth20";
 import jwt from "passport-jwt";
 import { userDao } from "../dao/mongo/user.dao.js";
-import { createHash } from "../utils/hashPassword.js";
+import { createHash, isValidPassword } from "../utils/hashPassword.js";
 import { cookieExtractor } from "../utils/cookieExtractor.js";
+import { createToken } from "../utils/jwt.js";
+import { cartDao } from "../dao/mongo/cart.dao.js";
+import envsConfig from "./envs.config.js";
 
 const LocalStrategy = local.Strategy;
 const GoogleStrategy = google.Strategy;
@@ -30,8 +33,12 @@ export const initializePassport = () => {
         const { first_name, last_name, age, role } = req.body;
         // validar si el usuario existe
         const user = await userDao.getByEmail(username);
+
         // Si el usuario existe, retornamos un mensaje de error
         if (user) return done(null, false, { message: "El usuario ya existe" }); // done es equivalente a un next() en los middlewares
+
+        // Creamos un carrito nuevo para el usuario
+        const cart = await cartDao.create();
 
         // Si el usuario no existe creamos un nuevo usuario
         const newUser = {
@@ -39,8 +46,9 @@ export const initializePassport = () => {
           last_name,
           age,
           email: username,
-          password: createHash(password),
+          password: createHash(password), // Encriptar el password
           role: role ? role : "user",
+          cart: cart._id,
         };
 
         const userRegister = await userDao.create(newUser);
@@ -48,6 +56,24 @@ export const initializePassport = () => {
         return done(null, userRegister);
       } catch (error) {
         return done(error);
+      }
+    })
+  );
+
+  passport.use(
+    "login",
+    new LocalStrategy({ usernameField: "email" }, async (username, password, done) => {
+      try {
+        const user = await userDao.getByEmail(username);
+
+        // Valida si existe el usuario o si el password no es el mismo que el que tenemos registrado en la base de datos
+        if (!user || !isValidPassword(password, user.password)) {
+          return done(null, false, { message: "Email o contraseña no válido" });
+        }
+
+        done(null, user);
+      } catch (error) {
+        done(error);
       }
     })
   );
@@ -79,8 +105,8 @@ export const initializePassport = () => {
     "google",
     new GoogleStrategy(
       {
-        clientID: "fds",
-        clientSecret: "dfs",
+        clientID: envsConfig.GOOGLE_CLIENT_ID,
+        clientSecret: envsConfig.GOOGLE_CLIENT_SECRET,
 
         callbackURL: "http://localhost:8080/api/sessions/google",
       },

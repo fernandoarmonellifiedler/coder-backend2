@@ -18,32 +18,15 @@ router.post("/register", passportCall("register"), async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", passportCall("login"), async (req, res) => {
   try {
-    const { email, password } = req.body;
+      // Generamos el token
+      const token = createToken(req.user);
 
-    if (email === "adminCoder@coder.com" && password === "adminCod3r123") {
-      req.session.user = {
-        email,
-        first_name: "Admin",
-        role: "admin",
-      };
-      return res.status(200).json({ status: "success", payload: req.session.user });
-    }
+      // Guardamos el token en una cookie
+      res.cookie("token", token, { httpOnly: true });
 
-    const user = await userDao.getByEmail(email);
-    // Valida si existe el usuario o si el password no es el mismo que el que tenemos registrado en la base de datos
-    if (!user || !isValidPassword(password, user.password)) {
-      return res.status(401).json({ status: "error", msg: "Email o contraseña no válido" });
-    }
-
-    req.session.user = {
-      email,
-      first_name: user.first_name,
-      role: "user",
-    };
-
-    res.status(200).json({ status: "success", payload: req.session.user });
+    res.status(200).json({ status: "success", payload: req.user });
   } catch (error) {
     console.log(error);
     res.status(500).json({ status: "Error", msg: "Error interno del servidor" });
@@ -62,7 +45,7 @@ router.get("/logout", async (req, res) => {
 
 router.get("/current", passportCall("jwt"), authorization("user"), async (req, res) => {
   try {
-      const user = await userDao.getById(req.user.id);
+    const user = await userDao.getById(req.user.id);
     res.status(200).json({ status: "success", payload: user });
   } catch (error) {
     console.log(error);
@@ -81,21 +64,6 @@ router.get(
   }
 );
 
-router.post("/auth", async (req, res) => {
-  const { email, password } = req.body;
-  const user = await userDao.getByEmail(email);
-  // Valida si existe el usuario o si el password no es el mismo que el que tenemos registrado en la base de datos
-  if (!user || !isValidPassword(password, user.password)) {
-    return res.status(401).json({ status: "error", msg: "Email o contraseña no válido" });
-  }
 
-  // Generamos el token
-  const token = createToken(user);
-
-  // Guardamos el token en una cookie
-  res.cookie("token", token, { httpOnly: true });
-
-  res.status(200).json({ status: "success", payload: { user, token } });
-});
 
 export default router;

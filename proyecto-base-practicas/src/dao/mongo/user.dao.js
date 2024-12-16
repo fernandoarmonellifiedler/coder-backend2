@@ -12,7 +12,7 @@ class UserDao {
   }
 
   async getByEmail(email) {
-    const user = await userModel.findOne({ email });
+    const user = await userModel.findOne({ email }).populate("cart");
     return user;
   }
 

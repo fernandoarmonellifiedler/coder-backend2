@@ -1,9 +1,14 @@
 import { Router } from "express";
 import { cartDao } from "../dao/mongo/cart.dao.js";
+import { authorization } from "../middlewares/authorization.middleware.js";
+import { productDao } from "../dao/mongo/product.dao.js";
+import { passportCall } from "../middlewares/passport.middleware.js";
 
 const router = Router();
 
-router.post("/", async (req, res) => {
+router.use(passportCall("jwt")); // Middleware a nivel rutas
+
+router.post("/", authorization("admin"), async (req, res) => {
   try {
     const cart = await cartDao.create();
 
@@ -14,7 +19,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/:cid", async (req, res) => {
+router.get("/:cid", authorization("user"), async (req, res) => {
   try {
     const { cid } = req.params;
     const cart = await cartDao.getById(cid);
@@ -27,7 +32,7 @@ router.get("/:cid", async (req, res) => {
   }
 });
 
-router.post("/:cid/product/:pid", async (req, res) => {
+router.post("/:cid/product/:pid", authorization("user"), async (req, res) => {
   try {
     const { cid, pid } = req.params;
     const product = await productDao.getById(pid);
@@ -44,7 +49,7 @@ router.post("/:cid/product/:pid", async (req, res) => {
   }
 });
 
-router.delete("/:cid/product/:pid", async (req, res) => {
+router.delete("/:cid/product/:pid", authorization("user"), async (req, res) => {
   try {
     const { cid, pid } = req.params;
     const product = await productDao.getById(pid);
@@ -61,7 +66,7 @@ router.delete("/:cid/product/:pid", async (req, res) => {
   }
 });
 
-router.put("/:cid/product/:pid", async (req, res) => {
+router.put("/:cid/product/:pid", authorization("user"), async (req, res) => {
   try {
     const { cid, pid } = req.params;
     const { quantity } = req.body;
@@ -80,7 +85,7 @@ router.put("/:cid/product/:pid", async (req, res) => {
   }
 });
 
-router.delete("/:cid", async (req, res) => {
+router.delete("/:cid", authorization("admin"), async (req, res) => {
   try {
     const { cid } = req.params;
     const cart = await cartDao.clearProductsToCart(cid);
