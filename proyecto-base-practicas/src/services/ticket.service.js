@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { ticketDao } from "../dao/mongo/ticket.dao.js";
+import { sendTicketMail } from "../utils/sendEmail.js";
 
 class TicketService {
   async create(amount, userMail) {
@@ -8,7 +9,9 @@ class TicketService {
       purchaser: userMail,
       amount,
     }
-      return await ticketDao.create(newTicket);
+    const ticket = await ticketDao.create(newTicket);
+    await sendTicketMail(userMail, ticket);
+    return ticket;
   }
 }
 
