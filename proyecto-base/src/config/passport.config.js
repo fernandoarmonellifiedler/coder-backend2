@@ -127,7 +127,7 @@ export const initializePassport = () => {
     new JWTStrategy(
       {
         jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
-        secretOrKey: "ClaveSecreta",
+        secretOrKey: envsConfig.JWT_KEY,
       },
       async (jwk_payload, done) => {
         try {

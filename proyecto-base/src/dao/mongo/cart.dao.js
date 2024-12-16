@@ -30,36 +30,6 @@ class CartDao {
     const cart = await cartModel.deleteOne({ _id: id });
     return cart;
   }
-
-
-  // Método para eliminar un producto de un carrito
-  async deleteProductToCart(cid, pid) {
-    const cart = await cartModel.findById(cid);
-    cart.products = cart.products.filter((element) => element.product != pid);
-    await cart.save();
-
-    return cart;
-  }
-
-  // Método para actualizar la cantidad de un producto en un carrito
-  async updateQuantityProductInCart(cid, pid, quantity) {
-    const cart = await cartModel.findById(cid);
-    const product = cart.products.find((element) => element.product == pid);
-    product.quantity = quantity;
-
-    await cart.save();
-    return cart;
-  }
-
-  // Método para eliminar todos los productos de un carrito
-  async clearProductsToCart(cid) {
-    const cart = await cartModel.findById(cid);
-    cart.products = [];
-
-    await cart.save();
-    return cart;
-  }
 }
 
 export const cartDao = new CartDao();
-

@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import express from "express";
 import routes from "./routes/index.js";
 import { Server } from "socket.io";
@@ -28,7 +29,7 @@ app.use(
     saveUninitialized: true, // Guardar la sesión aunque no haya cambios
   })
 );
-
+app.use(cookieParser(envsConfig.SECRET_KEY));
 // Rutas de la API
 app.use("/api", routes);
 

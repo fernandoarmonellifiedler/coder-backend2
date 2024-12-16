@@ -20,9 +20,18 @@ class ProductService {
     return true;
   }
 
-  async update(id, data) {}
+  async update(id, data) {
+    const product = await productDao.getById(id);
+    if(!product) return null;
 
-  async create(data) {}
+    const productUpdate = await productDao.update(id, data);
+    return productUpdate;
+  }
+
+  async create(data) {
+    const product = await productDao.create(data);
+    return product;
+  }
 }
 
 export const productService = new ProductService();
