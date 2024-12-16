@@ -6,6 +6,7 @@ import { connectMongoDB } from "./config/mongoDB.config.js";
 import { initializePassport } from "./config/passport.config.js";
 import routes from "./routes/index.js";
 import envsConfig from "./config/envs.config.js";
+import cors from "cors";
 
 const app = express();
 
@@ -14,6 +15,8 @@ initializePassport();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(cors());
 
 app.use(express.static("public"));
 app.use(
