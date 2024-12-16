@@ -12,7 +12,7 @@
   {
     "title": "Zapatillas Running",
     "description": "Zapatillas cómodas para correr largas distancias.",
-    "price": 75.50,
+    "price": 75.5,
     "thumbnail": ["img3.jpg", "img4.jpg"],
     "code": "ZR002",
     "stock": 80,
@@ -22,7 +22,7 @@
   {
     "title": "Raqueta de Tenis",
     "description": "Raqueta ligera y resistente.",
-    "price": 120.00,
+    "price": 120.0,
     "thumbnail": ["img5.jpg", "img6.jpg"],
     "code": "RT003",
     "stock": 30,
@@ -42,7 +42,7 @@
   {
     "title": "Botella de Agua",
     "description": "Botella reutilizable de acero inoxidable.",
-    "price": 15.50,
+    "price": 15.5,
     "thumbnail": ["img9.jpg", "img10.jpg"],
     "code": "BA005",
     "stock": 200,
@@ -52,7 +52,7 @@
   {
     "title": "Pantalones de Senderismo",
     "description": "Pantalones resistentes al agua y al viento.",
-    "price": 55.00,
+    "price": 55.0,
     "thumbnail": ["img11.jpg", "img12.jpg"],
     "code": "PS006",
     "stock": 70,
@@ -72,7 +72,7 @@
   {
     "title": "Guantes de Ciclismo",
     "description": "Guantes acolchados para mayor comodidad.",
-    "price": 20.00,
+    "price": 20.0,
     "thumbnail": ["img15.jpg", "img16.jpg"],
     "code": "GC008",
     "stock": 90,
@@ -82,7 +82,7 @@
   {
     "title": "Camiseta Casual",
     "description": "Camiseta de algodón para uso diario.",
-    "price": 18.50,
+    "price": 18.5,
     "thumbnail": ["img17.jpg", "img18.jpg"],
     "code": "CC009",
     "stock": 140,
@@ -92,7 +92,7 @@
   {
     "title": "Sandalias de Playa",
     "description": "Sandalias cómodas para la playa.",
-    "price": 22.00,
+    "price": 22.0,
     "thumbnail": ["img19.jpg", "img20.jpg"],
     "code": "SP010",
     "stock": 100,
@@ -112,7 +112,7 @@
   {
     "title": "Sudadera con Capucha",
     "description": "Sudadera cómoda y abrigada.",
-    "price": 35.00,
+    "price": 35.0,
     "thumbnail": ["img23.jpg", "img24.jpg"],
     "code": "SC012",
     "stock": 75,
@@ -122,7 +122,7 @@
   {
     "title": "Balón de Fútbol",
     "description": "Balón de alta calidad para partidos.",
-    "price": 25.00,
+    "price": 25.0,
     "thumbnail": ["img25.jpg", "img26.jpg"],
     "code": "BF013",
     "stock": 90,
@@ -152,7 +152,7 @@
   {
     "title": "Cinturón de Hidratación",
     "description": "Cinturón con botellas de agua incluidas.",
-    "price": 30.00,
+    "price": 30.0,
     "thumbnail": ["img31.jpg", "img32.jpg"],
     "code": "CH016",
     "stock": 60,
@@ -162,7 +162,7 @@
   {
     "title": "Pesas Ajustables",
     "description": "Pesas con sistema de ajuste rápido.",
-    "price": 75.00,
+    "price": 75.0,
     "thumbnail": ["img33.jpg", "img34.jpg"],
     "code": "PA017",
     "stock": 50,
@@ -172,7 +172,7 @@
   {
     "title": "Bolsa de Deporte",
     "description": "Bolsa grande y resistente para deporte.",
-    "price": 40.00,
+    "price": 40.0,
     "thumbnail": ["img35.jpg", "img36.jpg"],
     "code": "BD018",
     "stock": 80,
@@ -192,7 +192,7 @@
   {
     "title": "Chaleco Reflectante",
     "description": "Chaleco para mayor visibilidad en la noche.",
-    "price": 15.00,
+    "price": 15.0,
     "thumbnail": ["img39.jpg", "img40.jpg"],
     "code": "CR020",
     "stock": 110,

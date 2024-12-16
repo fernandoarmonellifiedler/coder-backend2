@@ -9,7 +9,7 @@ export const isAdmin = async (req = request, res = response, next) => {
       return res
         .status(401)
         .json({ status: "error", msg: "Usuario no logueado" });
-        
+
     // Verificamos si el usuario tiene rol de administrador
     if (user.role !== "admin")
       return res

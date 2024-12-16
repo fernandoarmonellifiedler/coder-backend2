@@ -59,7 +59,7 @@ class CartService {
 
       if (prod.stock >= productCart.quantity) {
         total += prod.price * productCart.quantity;
-        
+
         prod.stock = prod.stock - productCart.quantity;
         await productDao.update(prod._id, { stock: prod.stock });
       } else {

@@ -19,6 +19,7 @@ export class CartController {
       const { cid } = req.params;
       const cart = await cartService.getCartById(cid);
       if (!cart) return res.status(404).json({ status: "Error", msg: "Carrito no encontrado" });
+
       res.status(200).json({ status: "success", cart });
     } catch (error) {
       console.log(error);
@@ -35,6 +36,7 @@ export class CartController {
 
       const cart = await cartService.addProductToCart(cid, pid);
       if (!cart) return res.status(404).json({ status: "Error", msg: `No se encontró el carrito con el id ${cid}` });
+
       res.status(200).json({ status: "success", payload: cart });
     } catch (error) {
       console.log(error);
@@ -85,6 +87,7 @@ export class CartController {
       const { cid } = req.params;
       const cart = await cartService.clearProductsToCart(cid);
       if (!cart) return res.status(404).json({ status: "Error", msg: "Carrito no encontrado" });
+
       res.status(200).json({ status: "success", cart });
     } catch (error) {
       console.log(error);
@@ -99,7 +102,7 @@ export class CartController {
       if (!cart) return res.status(404).json({ status: "Error", msg: "Carrito no encontrado" });
 
       const total = await cartService.purchaseCart(cid);
-      if (total === 0) return  res.status(400).json({ status: "erro", msg: "No stock suficiente para comprar los productos" });
+      if (total === 0) return res.status(400).json({ status: "erro", msg: "No stock suficiente para comprar los productos" });
 
       const ticket = await ticketService.create(total, req.user.email);
 

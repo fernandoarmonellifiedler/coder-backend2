@@ -9,13 +9,13 @@ const router = Router();
 router.post("/", passportCall('jwt'), authorization("admin"), cartController.createCart);
 
 // Obtener carrito por ID (solo usuarios autorizados)
-router.get("/:cid",passportCall('jwt'),  authorization("user"), cartController.getCartById);
+router.get("/:cid", passportCall('jwt'), authorization("user"), cartController.getCartById);
 
 // Añadir producto al carrito
-router.post("/:cid/product/:pid",passportCall('jwt'), authorization("user"), cartController.addProductToCart);
+router.post("/:cid/product/:pid", passportCall('jwt'), authorization("user"), cartController.addProductToCart);
 
 // Comprar productos del carrito
-router.post("/:cid/purchase",passportCall('jwt'), authorization("user"), cartController.purchaseCart);
+router.post("/:cid/purchase", passportCall('jwt'), authorization("user"), cartController.purchaseCart);
 
 // Eliminar producto del carrito
 router.delete("/:cid/product/:pid", passportCall('jwt'), authorization("user"), cartController.deleteProductToCart);

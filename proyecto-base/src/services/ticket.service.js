@@ -8,7 +8,7 @@ class TicketService {
       purchaser: userMail,
       amount,
     }
-      return await ticketDao.create(newTicket);
+    return await ticketDao.create(newTicket);
   }
 }
 
