@@ -84,7 +84,6 @@ export const initializePassport = () => {
   });
 
   // Estrategia de google
-
   passport.use(
     "google",
     new GoogleStrategy(
@@ -92,7 +91,7 @@ export const initializePassport = () => {
         clientID: envsConfig.GOOGLE_CLIENT_ID,
         clientSecret: envsConfig.GOOGLE_CLIENT_SECRET,
 
-        callbackURL: "http://localhost:8080/api/sessions/google",
+        callbackURL: "https://localhost:8080/api/sessions/google",
       },
       async (accessToken, refreshToken, profile, cb) => {
         try {
